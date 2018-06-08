@@ -292,7 +292,7 @@
         label.className = "checkbox";
         var input = ce("input");
         input.setAttribute("type", "checkbox");
-        input.setAttribute("id", name.toLowerCase());
+        input.setAttribute("id", name.toLowerCase().split(" ").join("_"));
         input.setAttribute("name", name.toLowerCase());
         label.appendChild(input);
         label.append(name);
@@ -309,7 +309,17 @@
         parent.appendChild(createCheckbox("explored"));
         parent.appendChild(labelFor("percentage", "SQA Tested%"));
         parent.appendChild(testedPercentage());
+        parent.appendChild(createCheckbox("IN TESTING"));
         return true;
+    }
+
+    function getDate(){
+        var mon=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        var d=new Date()
+        var year=d.getFullYear().toString().substring(2)
+        var month=mon[d.getMonth()]
+        var day=d.getDay().toString()
+        return day+'/'+month+"/"+year
     }
 
     function addTestControl(){
@@ -350,8 +360,14 @@
             if(labels.length > 0 || this.percentage.value){
                 sendData(`${baseURL}/issue/${issueKey}`, payload, "put");
             }
-            return true;
-        };
+             //set in testing status
+            console.log(this.in_testing);
+            if(this.in_testing.checked){
+                sendData(`${baseURL}/issue/${issueKey}/transitions`, {
+                    transition: {id: "371"}
+                }, "post");
+            }
+        }
     }
 
     function createDom(){
