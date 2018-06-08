@@ -356,7 +356,7 @@
             if(this.in_testing.checked){
                 sendData(`${baseURL}/issue/${issueKey}/transitions`, {
                     transition: {id: "371"}
-                }, "post");
+                }, 'post');
             }
         }
     }
