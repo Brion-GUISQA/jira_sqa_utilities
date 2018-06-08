@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira SQA Utilities
 // @namespace    http://tampermonkey.net/
-// @version      0.11
+// @version      0.12
 // @description  Shortcuts of frequently used Jira fields
 // @author       Frost Ming
 // @match        http://jira-brion.asml.com/browse/*
@@ -311,15 +311,6 @@
         parent.appendChild(testedPercentage());
         parent.appendChild(createCheckbox("IN TESTING"));
         return true;
-    }
-
-    function getDate(){
-        var mon=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-        var d=new Date()
-        var year=d.getFullYear().toString().substring(2)
-        var month=mon[d.getMonth()]
-        var day=d.getDay().toString()
-        return day+'/'+month+"/"+year
     }
 
     function addTestControl(){
