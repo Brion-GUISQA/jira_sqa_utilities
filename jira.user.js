@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira SQA Utilities
 // @namespace    http://tampermonkey.net/
-// @version      0.12
+// @version      0.13
 // @description  Shortcuts of frequently used Jira fields
 // @author       Frost Ming
 // @match        http://jira-brion.asml.com/browse/*
@@ -18,6 +18,27 @@
         var pathParts = document.location.pathname.split('/');
         return pathParts[pathParts.length-1];
     })();
+    
+    //get supported transactions of this ticket
+    var trans;
+    function extract_tran(json){
+        var res={};
+        for(var i in json.transitions){
+            res[json.transitions[i].name]=json.transitions[i].id;
+        }
+        return res
+    }
+    function update_trans(){
+        $.ajax({
+            type : "get",
+             url : `${baseURL}/issue/${issueKey}/transitions`,
+             async : false,
+             success : function(data){
+                 trans=extract_tran(data);
+             },
+        })
+     }
+
     // Fix version
     var fixVersion = document.querySelector('#fixfor-val a') && document.querySelector('#fixfor-val a').innerHTML;
     var isFI = ["Improvement", "New Feature", "Sub-feature", "Sub-improvement"].indexOf(
@@ -292,24 +313,44 @@
         label.className = "checkbox";
         var input = ce("input");
         input.setAttribute("type", "checkbox");
-        input.setAttribute("id", name.toLowerCase().split(" ").join("_"));
+        input.setAttribute("id", name.toLowerCase());
         input.setAttribute("name", name.toLowerCase());
         label.appendChild(input);
         label.append(name);
         return label;
     }
 
+    function ticketStatus() {
+        var select = ce("select");
+        select.setAttribute("name", "status");
+        select.setAttribute("id", "status");
+        var empty = ce("option");
+        empty.setAttribute("value", "");
+        empty.innerHTML = "";
+        select.appendChild(empty);
+        update_trans();
+        for (var v in trans){
+            var option = ce("option");
+            option.setAttribute("value", trans[v]);
+            option.innerHTML = v;
+            select.appendChild(option);
+        }
+        return select;
+    }
+
     function addExtraControl(){
         if(controlAdded) return;
         controlAdded = true;
         var parent = document.querySelector('#issue-comment-add .form-footer .buttons');
+        controlAdded = true;
         parent.appendChild(labelFor("buildSelector", "Build"));
         parent.appendChild(buildSelector());
         parent.appendChild(createCheckbox("Pass"));
         parent.appendChild(createCheckbox("explored"));
         parent.appendChild(labelFor("percentage", "SQA Tested%"));
         parent.appendChild(testedPercentage());
-        parent.appendChild(createCheckbox("IN TESTING"));
+        parent.appendChild(labelFor("status", "status"));
+        parent.appendChild(ticketStatus());
         return true;
     }
 
@@ -351,11 +392,11 @@
             if(labels.length > 0 || this.percentage.value){
                 sendData(`${baseURL}/issue/${issueKey}`, payload, "put");
             }
-             //set in testing status
-            console.log(this.in_testing);
-            if(this.in_testing.checked){
+             //set in ticket status
+
+            if(this.status.value){
                 sendData(`${baseURL}/issue/${issueKey}/transitions`, {
-                    transition: {id: "371"}
+                    transition: {id:this.status.value}
                 }, "post");
             }
         }
