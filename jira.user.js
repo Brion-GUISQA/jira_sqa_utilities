@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira SQA Utilities
 // @namespace    http://tampermonkey.net/
-// @version      0.13
+// @version      0.14
 // @description  Shortcuts of frequently used Jira fields
 // @author       Frost Ming
 // @match        http://jira-brion.asml.com/browse/*
