@@ -349,8 +349,8 @@
         parent.appendChild(createCheckbox("explored"));
         parent.appendChild(labelFor("percentage", "SQA Tested%"));
         parent.appendChild(testedPercentage());
-        parent.appendChild(labelFor("status", "status"));
-        parent.appendChild(ticketStatus());
+        //parent.appendChild(labelFor("status", "status"));
+        //parent.appendChild(ticketStatus());
         return true;
     }
 
