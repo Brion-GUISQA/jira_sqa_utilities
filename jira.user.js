@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira SQA Utilities
 // @namespace    http://tampermonkey.net/
-// @version      0.15
+// @version      0.16
 // @description  Shortcuts of frequently used Jira fields
 // @author       Frost Ming
 // @match        http://jira-brion.asml.com/browse/*
@@ -42,6 +42,8 @@
     // Fix version
     var fixVersion = document.querySelector('#fixfor-val a') && document.querySelector('#fixfor-val a').innerHTML;
     var isFI = ["Improvement", "New Feature", "Sub-feature", "Sub-improvement"].indexOf(
+        document.getElementById('type-val').innerText.trim()) >= 0;
+    var needScore= ["Improvement","New Feature","Epic","Sub-feature", "Sub-improvement"].indexOf(
         document.getElementById('type-val').innerText.trim()) >= 0;
     var controlAdded = false;
     // create element
@@ -457,7 +459,7 @@
         }
         div.appendChild(createWorkLogForm());
         div.appendChild(createAddCaseForm());
-        if(isFI){
+        if(needScore){
             div.appendChild(createSQAQualityForm());
         }
         parent.appendChild(div);
