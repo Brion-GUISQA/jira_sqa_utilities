@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira SQA Utilities
 // @namespace    http://tampermonkey.net/
-// @version      0.14
+// @version      0.15
 // @description  Shortcuts of frequently used Jira fields
 // @author       Frost Ming
 // @match        http://jira-brion.asml.com/browse/*
@@ -269,6 +269,35 @@
         return form;
     }
 
+        function createSQAQualityForm() {
+        var form = ce("form");
+        form.setAttribute("id", "SQAQualityForm");
+        var fieldset = ce("fieldset");
+        var label = labelFor("SQAQualityInput", "SQA Quality");
+        var input = ce("input");
+        input.setAttribute("name", "testPlanInput");
+        input.setAttribute("id", "testPlanInput");
+        input.setAttribute("required", true);
+        input.setAttribute("placeholder", "score=5; Description; No issue left");
+        var submit = ce("input");
+        submit.setAttribute("type", "submit");
+        fieldset.appendChild(label);
+        fieldset.appendChild(input);
+        fieldset.appendChild(submit);
+        form.appendChild(fieldset);
+        form.onsubmit = function() {
+            sendData(`${baseURL}/issue/${issueKey}`, {
+                update: {
+                    "customfield_10250":[
+                        {set: this.testPlanInput.value}
+                    ]
+                }
+            }, "put");
+            return false;
+        };
+        return form;
+    }
+
     function buildSelector() {
         var select = ce("select");
         select.setAttribute("name", "buildSelector");
@@ -428,6 +457,9 @@
         }
         div.appendChild(createWorkLogForm());
         div.appendChild(createAddCaseForm());
+        if(isFI){
+            div.appendChild(createSQAQualityForm());
+        }
         parent.appendChild(div);
         addTestControl();
     }
