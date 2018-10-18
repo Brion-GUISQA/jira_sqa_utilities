@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira SQA Utilities
 // @namespace    http://tampermonkey.net/
-// @version      0.17
+// @version      0.18
 // @description  Shortcuts of frequently used Jira fields
 // @author       Frost Ming
 // @match        http://jira-brion.asml.com/browse/*
@@ -47,6 +47,7 @@
     document.getElementById('type-val').innerText.trim()) >= 0;
   var needScore = ["Improvement", "New Feature", "Epic", "Sub-feature", "Sub-improvement"].indexOf(
     document.getElementById('type-val').innerText.trim()) >= 0;
+  var isEpic = document.getElementById('type-val').innerText.trim() == "Epic"
   var controlAdded = false;
   // create element
   function ce(name) {
@@ -80,7 +81,8 @@
     casesAdded: hasLabel(['cases_added', 'no_need_cases', 'automated']),
     hasCCC: hasLabel(['qav_ccc', 'no_need_ccc']),
     hasQAOwenr: Boolean(document.getElementById('customfield_10011-val')),
-    hasScore: Boolean(document.getElementById('customfield_10250-val'))
+    hasScore: Boolean(document.getElementById('customfield_10250-val')),
+    hasEpicLink: Boolean(document.getElementById('customfield_11632-val'))
   };
   // send data to Jira
   function sendData(url, payload, method = "post") {
@@ -153,6 +155,35 @@
         update: {
           "customfield_10732": [{
             set: this.testPlanInput.value
+          }]
+        }
+      }, "put");
+      return false;
+    };
+    return form;
+  }
+    
+  function createEpicLinkForm() {
+    var form = ce("form");
+    form.setAttribute("id", "epicLinkForm");
+    var fieldset = ce("fieldset");
+    var label = labelFor("epicLinkInput", "Epic Link");
+    var input = ce("input");
+    input.setAttribute("name", "epicLinkInput");
+    input.setAttribute("id", "epicLinkInput");
+    input.setAttribute("placeholder", "GUI-12345");
+    input.setAttribute("required", true);
+    var submit = ce("input");
+    submit.setAttribute("type", "submit");
+    fieldset.appendChild(label);
+    fieldset.appendChild(input);
+    fieldset.appendChild(submit);
+    form.appendChild(fieldset);
+    form.onsubmit = function () {
+      sendData(`${baseURL}/issue/${issueKey}`, {
+        update: {
+          "customfield_11632": [{
+            set: this.epicLinkInput.value
           }]
         }
       }, "put");
@@ -334,7 +365,7 @@
     option.innerHTML = "nightly";
     select.appendChild(option)
     for (var item of ["QA", "RC"]) {
-      for (var num = 1; num < 11; num++) {
+      for (var num = 1; num < 13; num++) {
         option = ce("option");
         option.setAttribute("value", item + num);
         option.innerHTML = item + num;
@@ -485,6 +516,9 @@
     var parent = document.getElementById("viewissuesidebar");
     var div = ce("div");
     div.className = "jira-sqa-utility";
+    if(!isEpic && !indicators.hasEpicLink){
+      div.appendChild(createEpicLinkForm());
+    }
     if (isFI && !indicators.hasTestPlan) {
       div.appendChild(createTestPlanForm());
     }
