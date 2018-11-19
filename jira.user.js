@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira SQA Utilities
 // @namespace    http://tampermonkey.net/
-// @version      0.18
+// @version      0.19
 // @description  Shortcuts of frequently used Jira fields
 // @author       Frost Ming
 // @match        http://jira-brion.asml.com/browse/*
@@ -12,7 +12,7 @@
   'use strict';
   // Basic URL of Jira REST API
   const document = unsafeWindow.document;
-  const baseURL = "http://jira-brion.asml.com/rest/api/2";
+  const baseURL = "https://jira-brion.asml.com/rest/api/2";
   // Issue key
   var issueKey = (function () {
     var pathParts = document.location.pathname.split('/');
