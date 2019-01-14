@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira SQA Utilities
 // @namespace    http://tampermonkey.net/
-// @version      0.19
+// @version      0.20
 // @description  Shortcuts of frequently used Jira fields
 // @author       Frost Ming
 // @match        http://jira-brion.asml.com/browse/*
@@ -328,11 +328,13 @@
     form.setAttribute("id", "SQAQualityForm");
     var fieldset = ce("fieldset");
     var label = labelFor("SQAQualityInput", "SQA Quality");
+    label.setAttribute("style","display:block")
     var input = ce("input");
     input.setAttribute("name", "testPlanInput");
     input.setAttribute("id", "testPlanInput");
     input.setAttribute("required", true);
     input.setAttribute("placeholder", "score=5; Description; No issue left");
+    input.setAttribute("style","display:block;width: 100%;margin:2px")
     var submit = ce("input");
     submit.setAttribute("type", "submit");
     fieldset.appendChild(label);
@@ -351,7 +353,7 @@
     };
     return form;
   }
-
+  
   function buildSelector() {
     var select = ce("select");
     select.setAttribute("name", "buildSelector");
@@ -519,7 +521,7 @@
     if(!isEpic && !indicators.hasEpicLink){
       div.appendChild(createEpicLinkForm());
     }
-    if (isFI && !indicators.hasTestPlan) {
+    if (needScore && !indicators.hasTestPlan) {
       div.appendChild(createTestPlanForm());
     }
     if (!indicators.hasEstimate) {
